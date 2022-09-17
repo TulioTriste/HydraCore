@@ -7,8 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum Payload {
 
-    GET_SPAWN_REPLICA,
-    GET_SPAWN_RESPONSE,
+    REMOVE_SPAWN_REPLICA,
+    REMOVE_SPAWN_RESPONSE,
     SEND_SPAWN_REPLICA,
     SEND_SPAWN_RESPONSE;
 }

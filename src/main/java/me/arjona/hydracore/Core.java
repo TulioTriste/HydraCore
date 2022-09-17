@@ -1,23 +1,27 @@
 package me.arjona.hydracore;
 
+import com.google.common.cache.CacheLoader;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoDatabase;
 import lombok.Getter;
+import me.arjona.hydracore.spawn.SpawnListener;
 import me.arjona.hydracore.spawn.commands.RemoveSpawnCommand;
 import me.arjona.hydracore.spawn.commands.SetSpawnCommand;
 import me.arjona.hydracore.spawn.commands.SpawnCommand;
 import me.arjona.hydracore.profile.ProfileManager;
 import me.arjona.hydracore.spawn.SpawnManager;
 import me.arjona.hydracore.utilities.FileConfig;
+import me.arjona.hydracore.utilities.TaskUtil;
 import me.arjona.hydracore.utilities.commands.CommandManager;
 import me.arjona.hydracore.utilities.menu.MenuListener;
 import me.arjona.hydracore.utilities.redis.Redis;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 @Getter
@@ -37,6 +41,7 @@ public class Core extends JavaPlugin {
         initConfigs();
         initDatabase();
         initManagers();
+        initListeners();
         initCommands();
         getServer().getPluginManager().registerEvents(new MenuListener(), this);
         serverName = mainConfig.getString("SERVER_NAME");
@@ -50,6 +55,12 @@ public class Core extends JavaPlugin {
     private void initManagers() {
         profileManager = new ProfileManager();
         spawnManager = new SpawnManager();
+    }
+
+    private void initListeners() {
+        Arrays.asList(new MenuListener(),
+                    new SpawnListener())
+                .forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this));
     }
 
     private void initConfigs() {

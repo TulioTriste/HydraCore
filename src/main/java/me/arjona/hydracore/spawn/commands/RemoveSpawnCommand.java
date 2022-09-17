@@ -28,7 +28,7 @@ public class RemoveSpawnCommand extends BaseCommand {
             return;
         }
 
-        String json = new RedisMessage(Payload.GET_SPAWN_REPLICA)
+        String json = new RedisMessage(Payload.REMOVE_SPAWN_REPLICA)
                 .setParam("SENDER", player.getName())
                 .toJSON();
         Core.get().getRedisManager().write(json);

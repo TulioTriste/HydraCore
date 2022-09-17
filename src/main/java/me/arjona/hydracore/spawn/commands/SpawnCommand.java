@@ -1,7 +1,5 @@
 package me.arjona.hydracore.spawn.commands;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import me.arjona.hydracore.Core;
 import me.arjona.hydracore.utilities.commands.BaseCommand;
 import me.arjona.hydracore.utilities.commands.Command;
@@ -29,6 +27,7 @@ public class SpawnCommand extends BaseCommand {
             return;
         }
 
+        player.sendMessage("Sending you to Spawn...");
         String json = new RedisMessage(Payload.SEND_SPAWN_REPLICA)
                 .setParam("SENDER", player.getName())
                 .setParam("SERVER", Core.get().getServerName())

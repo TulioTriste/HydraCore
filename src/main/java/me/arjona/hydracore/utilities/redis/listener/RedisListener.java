@@ -1,5 +1,6 @@
 package me.arjona.hydracore.utilities.redis.listener;
 
+import com.google.common.cache.CacheLoader;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
@@ -21,18 +22,19 @@ public class RedisListener extends JedisPubSub {
         A switch is made to assign the action for each type of Payload, it can also be done by "if"
          */
         switch (redisMessage.getPayload()) {
-            case GET_SPAWN_REPLICA: {
+            case REMOVE_SPAWN_REPLICA: {
                 if (plugin.getSpawnManager().getSpawnLocation() != null) {
                     plugin.getSpawnManager().remove();
                     Core.get().getRedisManager().write(
-                            new RedisMessage(Payload.GET_SPAWN_RESPONSE)
+                            new RedisMessage(Payload.REMOVE_SPAWN_RESPONSE)
                                 .setParam("SENDER", redisMessage.getParam("SENDER"))
                                 .setParam("SERVER", Core.get().getServerName())
                                 .toJSON());
+                    System.out.println("[HydraCore] The Spawn has been removed by " + redisMessage.getParam("SENDER") + " from " + redisMessage.getParam("SERVER"));
                 }
                 break;
             }
-            case GET_SPAWN_RESPONSE: {
+            case REMOVE_SPAWN_RESPONSE: {
                 if (redisMessage.getParam("SERVER").equals(Core.get().getServerName())) {
                     Player player = Bukkit.getPlayer(redisMessage.getParam("SENDER"));
                     if (player != null) {
@@ -49,6 +51,8 @@ public class RedisListener extends JedisPubSub {
                                     .setParam("SERVER_SPAWN", Core.get().getServerName())
                                     .setParam("SERVER_SEND", redisMessage.getParam("SERVER"))
                                     .toJSON());
+
+                    Core.get().getSpawnManager().getCacheBuilder().put("Hydra", redisMessage.getParam("SENDER"));
                 }
                 break;
             }
