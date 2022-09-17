@@ -4,6 +4,8 @@ import me.arjona.hydracore.Core;
 import me.arjona.hydracore.utilities.commands.BaseCommand;
 import me.arjona.hydracore.utilities.commands.Command;
 import me.arjona.hydracore.utilities.commands.CommandArgs;
+import me.arjona.hydracore.utilities.redis.impl.Payload;
+import me.arjona.hydracore.utilities.redis.util.RedisMessage;
 import org.bukkit.entity.Player;
 
 /*
@@ -26,6 +28,10 @@ public class RemoveSpawnCommand extends BaseCommand {
             return;
         }
 
-
+        String json = new RedisMessage(Payload.GET_SPAWN_REPLICA)
+                .setParam("SENDER", player.getName())
+                .toJSON();
+        Core.get().getRedisManager().write(json);
+        player.sendMessage("Spawn removed!");
     }
 }

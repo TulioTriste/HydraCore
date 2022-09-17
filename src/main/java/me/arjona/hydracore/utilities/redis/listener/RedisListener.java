@@ -1,8 +1,13 @@
 package me.arjona.hydracore.utilities.redis.listener;
 
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import me.arjona.hydracore.Core;
+import me.arjona.hydracore.utilities.redis.impl.Payload;
 import me.arjona.hydracore.utilities.redis.util.RedisMessage;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import redis.clients.jedis.JedisPubSub;
 
 public class RedisListener extends JedisPubSub {
@@ -15,106 +20,54 @@ public class RedisListener extends JedisPubSub {
         /*
         A switch is made to assign the action for each type of Payload, it can also be done by "if"
          */
-        /*switch (redisMessage.getPayload()) {
-            case STAFF_JOIN: {
-                if (!Payload.getBoolean(Payload.STAFF_JOIN)) break;
-                String player = redisMessage.getParam("PLAYER");
-                String prefix = redisMessage.getParam("PREFIX");
-                String server = redisMessage.getParam("SERVER");
-                Bukkit.getOnlinePlayers().forEach(players -> {
-                    if (players.hasPermission("pandacore.staff.join")) {
-                        players.sendMessage(ChatUtil.translate(langConfig.getString(Payload.STAFF_JOIN.getSection()
-                                .replace("{server}", server)
-                                .replace("{prefix}", prefix)
-                                .replace("{player}", player))));
-                    }
-                });
-            }
-            break;
-            case STAFF_LEAVE: {
-                if (!Payload.getBoolean(Payload.STAFF_LEAVE)) break;
-                String player = redisMessage.getParam("PLAYER");
-                String prefix = redisMessage.getParam("PREFIX");
-                String server = redisMessage.getParam("SERVER");
-                Bukkit.getOnlinePlayers().forEach(players -> {
-                    if (players.hasPermission("pandacore.staff.leave")) {
-                        players.sendMessage(ChatUtil.translate(langConfig.getString(Payload.STAFF_LEAVE.getSection())
-                                .replace("{server}", server)
-                                .replace("{prefix}", prefix)
-                                .replace("{player}", player)));
-                    }
-                });
-            }
-            break;
-            case STAFF_CHAT: {
-                if (!Payload.getBoolean(Payload.STAFF_CHAT)) break;
-                String player = redisMessage.getParam("PLAYER");
-                String prefix = redisMessage.getParam("PREFIX");
-                String server = redisMessage.getParam("SERVER");
-                String message1 = redisMessage.getParam("MESSAGE");
-                Bukkit.getOnlinePlayers().forEach(players -> {
-                    if (players.hasPermission("pandacore.staff.chat")) {
-                        players.sendMessage(ChatUtil.translate(langConfig.getString(Payload.STAFF_CHAT.getSection())
-                                .replace("{server}", server)
-                                .replace("{prefix}", prefix)
-                                .replace("{player}", player)
-                                .replace("{message}", message1)));
-                    }
-                });
-            }
-            break;
-            case ADMIN_CHAT: {
-                if (!Payload.getBoolean(Payload.ADMIN_CHAT)) break;
-                String player = redisMessage.getParam("PLAYER");
-                String prefix = redisMessage.getParam("PREFIX");
-                String server = redisMessage.getParam("SERVER");
-                String message1 = redisMessage.getParam("MESSAGE");
-                Bukkit.getOnlinePlayers().forEach(players -> {
-                    if (players.hasPermission("pandacore.admin")) {
-                        players.sendMessage(ChatUtil.translate(langConfig.getString(Payload.ADMIN_CHAT.getSection())
-                                .replace("{server}", server)
-                                .replace("{prefix}", prefix)
-                                .replace("{player}", player)
-                                .replace("{message}", message1)));
-                    }
-                });
-            }
-            break;
-            case LOAD_SERVER: {
-                if (!Payload.getBoolean(Payload.LOAD_SERVER)) break;
-                String server = redisMessage.getParam("SERVER");
-                Bukkit.getOnlinePlayers().forEach(players -> {
-                    if (players.hasPermission("pandacore.admin") || players.isOnline()) {
-                        players.sendMessage(ChatUtil.translate(langConfig.getString(Payload.LOAD_SERVER.getSection())
-                                .replace("{server}", server)));
-                    }
-                });
-            }
-            break;
-            case CLOSE_SERVER: {
-                if (!Payload.getBoolean(Payload.CLOSE_SERVER)) break;
-                String server = redisMessage.getParam("SERVER");
-                if (Core.SERVER_NAME.equals(server)) {
-                    Bukkit.shutdown();
+        switch (redisMessage.getPayload()) {
+            case GET_SPAWN_REPLICA: {
+                if (plugin.getSpawnManager().getSpawnLocation() != null) {
+                    plugin.getSpawnManager().remove();
+                    Core.get().getRedisManager().write(
+                            new RedisMessage(Payload.GET_SPAWN_RESPONSE)
+                                .setParam("SENDER", redisMessage.getParam("SENDER"))
+                                .setParam("SERVER", Core.get().getServerName())
+                                .toJSON());
                 }
+                break;
             }
-            break;
-            case ENABLE_WHITELIST: {
-                if (!Payload.getBoolean(Payload.ENABLE_WHITELIST)) break;
-                String server = redisMessage.getParam("SERVER");
-                if (Core.SERVER_NAME.equals(server)) Bukkit.setWhitelist(true);
+            case GET_SPAWN_RESPONSE: {
+                if (redisMessage.getParam("SERVER").equals(Core.get().getServerName())) {
+                    Player player = Bukkit.getPlayer(redisMessage.getParam("SENDER"));
+                    if (player != null) {
+                        player.sendMessage("The Spawn has been removed in " + redisMessage.getParam("SERVER"));
+                    }
+                }
+                break;
             }
-            break;
-            case DISABLE_WHITELIST: {
-                if (!Payload.getBoolean(Payload.DISABLE_WHITELIST)) break;
-                String server = redisMessage.getParam("SERVER");
-                if (Core.SERVER_NAME.equals(server)) Bukkit.setWhitelist(false);
+            case SEND_SPAWN_REPLICA: {
+                if (plugin.getSpawnManager().getSpawnLocation() != null) {
+                    Core.get().getRedisManager().write(
+                            new RedisMessage(Payload.SEND_SPAWN_RESPONSE)
+                                    .setParam("SENDER", redisMessage.getParam("SENDER"))
+                                    .setParam("SERVER_SPAWN", Core.get().getServerName())
+                                    .setParam("SERVER_SEND", redisMessage.getParam("SERVER"))
+                                    .toJSON());
+                }
+                break;
             }
-            break;
+            case SEND_SPAWN_RESPONSE: {
+                if (redisMessage.getParam("SERVER_SEND").equals(Core.get().getServerName())) {
+                    Player player = Bukkit.getPlayer(redisMessage.getParam("SENDER"));
+                    if (player != null) {
+                        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+                        out.writeUTF("Connect");
+                        out.writeUTF(redisMessage.getParam("SERVER_SPAWN"));
+                        player.sendPluginMessage(Core.get(), "BungeeCord", out.toByteArray());
+                    }
+                }
+                break;
+            }
             default: {
                 plugin.getLogger().info("[Redis] The message was received, but there was no response");
             }
             break;
-        }*/
+        }
     }
 }

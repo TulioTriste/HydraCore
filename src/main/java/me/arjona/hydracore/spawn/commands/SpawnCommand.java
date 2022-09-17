@@ -6,6 +6,8 @@ import me.arjona.hydracore.Core;
 import me.arjona.hydracore.utilities.commands.BaseCommand;
 import me.arjona.hydracore.utilities.commands.Command;
 import me.arjona.hydracore.utilities.commands.CommandArgs;
+import me.arjona.hydracore.utilities.redis.impl.Payload;
+import me.arjona.hydracore.utilities.redis.util.RedisMessage;
 import org.bukkit.entity.Player;
 
 /*
@@ -22,13 +24,15 @@ public class SpawnCommand extends BaseCommand {
     public void onCommand(CommandArgs command) {
         Player player = command.getPlayer();
 
-        /*ByteArrayDataOutput out = ByteStreams.newDataOutput();
-        out.writeUTF("Connect");
-        out.writeUTF("Survi1");
-        player.sendPluginMessage(Core.get(), "BungeeCord", out.toByteArray());*/
-
         if (Core.get().getSpawnManager().getSpawnLocation() != null) {
-
+            player.teleport(Core.get().getSpawnManager().getSpawnLocation());
+            return;
         }
+
+        String json = new RedisMessage(Payload.SEND_SPAWN_REPLICA)
+                .setParam("SENDER", player.getName())
+                .setParam("SERVER", Core.get().getServerName())
+                .toJSON();
+        Core.get().getRedisManager().write(json);
     }
 }

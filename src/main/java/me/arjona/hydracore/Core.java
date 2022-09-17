@@ -6,6 +6,7 @@ import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoDatabase;
 import lombok.Getter;
+import me.arjona.hydracore.spawn.commands.RemoveSpawnCommand;
 import me.arjona.hydracore.spawn.commands.SetSpawnCommand;
 import me.arjona.hydracore.spawn.commands.SpawnCommand;
 import me.arjona.hydracore.profile.ProfileManager;
@@ -23,10 +24,11 @@ import java.util.Collections;
 public class Core extends JavaPlugin {
 
     private FileConfig mainConfig, databaseConfig;
-    public MongoDatabase mongoDatabase;
+    private MongoDatabase mongoDatabase;
     private Redis redisManager;
     private ProfileManager profileManager;
     private SpawnManager spawnManager;
+    private String serverName;
 
     @Override
     public void onEnable() {
@@ -37,6 +39,7 @@ public class Core extends JavaPlugin {
         initManagers();
         initCommands();
         getServer().getPluginManager().registerEvents(new MenuListener(), this);
+        serverName = mainConfig.getString("SERVER_NAME");
     }
 
     @Override
@@ -58,6 +61,7 @@ public class Core extends JavaPlugin {
         new CommandManager(this, Collections.emptyList());
         new SetSpawnCommand();
         new SpawnCommand();
+        new RemoveSpawnCommand();
     }
 
     private void initDatabase() {
