@@ -1,0 +1,16 @@
+MONGO:
+  HOST: 127.0.0.1
+  PORT: 27017
+  DATABASE: 'pandacore'
+  AUTHENTICATION:
+    ENABLED: false
+    USERNAME: root
+    PASSWORD: ''
+    DATABASE: 'admin'
+
+REDIS:
+  HOST: 127.0.0.1
+  PORT: 6379
+  AUTHENTICATION:
+    ENABLED: false
+    PASSWORD: ''
