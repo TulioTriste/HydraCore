@@ -13,6 +13,10 @@ import me.arjona.hydracore.spawn.commands.SetSpawnCommand;
 import me.arjona.hydracore.spawn.commands.SpawnCommand;
 import me.arjona.hydracore.profile.ProfileManager;
 import me.arjona.hydracore.spawn.SpawnManager;
+import me.arjona.hydracore.teleport.TeleportManager;
+import me.arjona.hydracore.teleport.commands.TPACommand;
+import me.arjona.hydracore.teleport.commands.TPAcceptCommand;
+import me.arjona.hydracore.utilities.CC;
 import me.arjona.hydracore.utilities.FileConfig;
 import me.arjona.hydracore.utilities.TaskUtil;
 import me.arjona.hydracore.utilities.commands.CommandManager;
@@ -32,6 +36,7 @@ public class Core extends JavaPlugin {
     private Redis redisManager;
     private ProfileManager profileManager;
     private SpawnManager spawnManager;
+    private TeleportManager teleportManager;
     private String serverName;
 
     @Override
@@ -39,12 +44,17 @@ public class Core extends JavaPlugin {
         // Plugin startup logic
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         initConfigs();
+
+        getServer().getConsoleSender().sendMessage(CC.translate("&aLoading HydraCore..."));
+
         initDatabase();
         initManagers();
         initListeners();
         initCommands();
         getServer().getPluginManager().registerEvents(new MenuListener(), this);
         serverName = mainConfig.getString("SERVER_NAME");
+
+        getServer().getConsoleSender().sendMessage(CC.translate("&aHydraCore loaded successfully!"));
     }
 
     @Override
@@ -55,6 +65,7 @@ public class Core extends JavaPlugin {
     private void initManagers() {
         profileManager = new ProfileManager();
         spawnManager = new SpawnManager();
+        teleportManager = new TeleportManager();
     }
 
     private void initListeners() {
@@ -73,6 +84,8 @@ public class Core extends JavaPlugin {
         new SetSpawnCommand();
         new SpawnCommand();
         new RemoveSpawnCommand();
+        new TPACommand();
+        new TPAcceptCommand();
     }
 
     private void initDatabase() {
