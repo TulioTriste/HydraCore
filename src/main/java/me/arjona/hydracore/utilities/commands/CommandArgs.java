@@ -9,7 +9,7 @@ public class CommandArgs {
 
     private final CommandSender sender;
     private final org.bukkit.command.Command command;
-    private final String label;
+    private final StringBuilder label;
     private final String[] args;
 
     protected CommandArgs(CommandSender sender, org.bukkit.command.Command command, String label, String[] args, int subCommand) {
@@ -26,7 +26,11 @@ public class CommandArgs {
         String cmdLabel = buffer.toString();
         this.sender = sender;
         this.command = command;
-        this.label = cmdLabel;
+        StringBuilder labelBuilder = new StringBuilder();
+        for (String s : cmdLabel.split("\\.")) {
+            labelBuilder.append(s);
+        }
+        // Hacer que el label sea una string con formato propio y espacios si es que es mas de 1 argumento
         this.args = modArgs;
     }
 

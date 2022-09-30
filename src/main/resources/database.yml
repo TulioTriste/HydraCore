@@ -1,7 +1,7 @@
 MONGO:
   HOST: 127.0.0.1
   PORT: 27017
-  DATABASE: 'pandacore'
+  DATABASE: 'hydracore'
   AUTHENTICATION:
     ENABLED: false
     USERNAME: root

@@ -1,28 +1,33 @@
 package me.arjona.hydracore;
 
-import com.google.common.cache.CacheLoader;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoDatabase;
 import lombok.Getter;
+import me.arjona.hydracore.profile.ProfileListener;
+import me.arjona.hydracore.profile.balance.BalanceCommand;
+import me.arjona.hydracore.profile.balance.DepositCommand;
+import me.arjona.hydracore.profile.balance.SetSubCommand;
 import me.arjona.hydracore.spawn.SpawnListener;
 import me.arjona.hydracore.spawn.commands.RemoveSpawnCommand;
 import me.arjona.hydracore.spawn.commands.SetSpawnCommand;
 import me.arjona.hydracore.spawn.commands.SpawnCommand;
 import me.arjona.hydracore.profile.ProfileManager;
 import me.arjona.hydracore.spawn.SpawnManager;
+import me.arjona.hydracore.teleport.TeleportListener;
 import me.arjona.hydracore.teleport.TeleportManager;
 import me.arjona.hydracore.teleport.commands.TPACommand;
 import me.arjona.hydracore.teleport.commands.TPAcceptCommand;
 import me.arjona.hydracore.utilities.CC;
 import me.arjona.hydracore.utilities.FileConfig;
-import me.arjona.hydracore.utilities.TaskUtil;
 import me.arjona.hydracore.utilities.commands.CommandManager;
 import me.arjona.hydracore.utilities.menu.MenuListener;
 import me.arjona.hydracore.utilities.redis.Redis;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
@@ -38,6 +43,7 @@ public class Core extends JavaPlugin {
     private SpawnManager spawnManager;
     private TeleportManager teleportManager;
     private String serverName;
+    private Economy econ = null;
 
     @Override
     public void onEnable() {
@@ -46,6 +52,12 @@ public class Core extends JavaPlugin {
         initConfigs();
 
         getServer().getConsoleSender().sendMessage(CC.translate("&aLoading HydraCore..."));
+
+        if (!setupEconomy() ) {
+            getLogger().severe("Disabled due to no Vault dependency found!" + getDescription().getName());
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
         initDatabase();
         initManagers();
@@ -60,6 +72,8 @@ public class Core extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        getServer().getConsoleSender().sendMessage(CC.translate("&cDisabling HydraCore..."));
+        profileManager.saveAll();
     }
 
     private void initManagers() {
@@ -70,7 +84,9 @@ public class Core extends JavaPlugin {
 
     private void initListeners() {
         Arrays.asList(new MenuListener(),
-                    new SpawnListener())
+                    new SpawnListener(),
+                        new ProfileListener(),
+                        new TeleportListener())
                 .forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this));
     }
 
@@ -86,6 +102,9 @@ public class Core extends JavaPlugin {
         new RemoveSpawnCommand();
         new TPACommand();
         new TPAcceptCommand();
+        new BalanceCommand();
+        new DepositCommand();
+        new SetSubCommand();
     }
 
     private void initDatabase() {
@@ -116,6 +135,18 @@ public class Core extends JavaPlugin {
         // Redis
         this.redisManager = new Redis();
         redisManager.connect();
+    }
+
+    private boolean setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            return false;
+        }
+        econ = rsp.getProvider();
+        return econ != null;
     }
 
     public static Core get() {

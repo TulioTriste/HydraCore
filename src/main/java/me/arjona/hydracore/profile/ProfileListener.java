@@ -25,14 +25,16 @@ public class ProfileListener implements Listener {
         if (event.getResult() == PlayerLoginEvent.Result.ALLOWED) {
             if (!Core.get().getProfileManager().getProfiles().containsKey(event.getPlayer().getUniqueId())) {
                 Profile profile = new Profile(event.getPlayer().getUniqueId(), event.getPlayer().getName());
-                try {
-                    // Load
-                } catch (Exception e) {
+                /*try {*/
+                    // Load Profile
+                    profile.load();
+                /*} catch (Exception e) {
+                    Core.get().getProfileManager().getProfiles().remove(event.getPlayer().getUniqueId());
                     event.disallow(
                             PlayerLoginEvent.Result.KICK_OTHER,
                             CC.translate("&cAn error occurred while loading your profile. Please try again later."));
                     throw new IllegalArgumentException("Player Profile could not be created, contact Arjona#0643");
-                }
+                }*/
             }
         }
     }
@@ -42,9 +44,8 @@ public class ProfileListener implements Listener {
         Player player = event.getPlayer();
         Profile profile = Core.get().getProfileManager().getProfile(player.getUniqueId());
         profile.setOnline(false);
-        TaskUtil.runAsync(() -> {
-            // SAVE
-        });
+        // SAVE
+        TaskUtil.runAsync(profile::save);
 
         Core.get().getProfileManager().getProfiles().remove(player.getUniqueId());
     }
