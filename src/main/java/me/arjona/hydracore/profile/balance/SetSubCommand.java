@@ -6,6 +6,7 @@ import me.arjona.hydracore.utilities.CC;
 import me.arjona.hydracore.utilities.commands.BaseCommand;
 import me.arjona.hydracore.utilities.commands.Command;
 import me.arjona.hydracore.utilities.commands.CommandArgs;
+import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.entity.Player;
 
 /*
@@ -22,7 +23,6 @@ public class SetSubCommand extends BaseCommand {
     public void onCommand(CommandArgs command) {
         Player player = command.getPlayer();
         String[] args = command.getArgs();
-        String label ;
 
         if (args.length == 0 || args.length == 1) {
             player.sendMessage(CC.translate("Usage: /" + command.getLabel() + " <player> <amount>"));
@@ -48,8 +48,12 @@ public class SetSubCommand extends BaseCommand {
             return;
         }
 
-        target.setBalance(amount);
-
-        player.sendMessage(CC.translate("&aYou have set " + target.getName() + "'s balance to " + amount));
+        EconomyResponse response = Core.get().getEcon().depositPlayer(target.getOfflinePlayer(), amount);
+        if (response.transactionSuccess()) {
+            target.setBalance(amount);
+            player.sendMessage(CC.translate("&aYou have set " + target.getName() + "'s balance to " + amount));
+        } else {
+            player.sendMessage(CC.translate("&cAn error has occurred."));
+        }
     }
 }

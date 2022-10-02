@@ -7,6 +7,7 @@ import lombok.Setter;
 import me.arjona.hydracore.Core;
 import org.bson.Document;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -61,23 +62,34 @@ public class Profile {
         return Bukkit.getPlayer(uuid);
     }
 
+    public OfflinePlayer getOfflinePlayer() {
+        return Bukkit.getOfflinePlayer(uuid);
+    }
+
+    /*public String getBalance() {
+        return Core.get().getEcon().format(Core.get().getEcon().getBalance(getOfflinePlayer()));
+    }*/
+
     public int getBalance() {
-        return (int) Core.get().getEcon().getBalance(name);
+        return balance;
+        /*return Core.get().getEcon().getBalance(getOfflinePlayer());*/
     }
 
     public void setBalance(int balance) {
         this.balance = balance;
-        Core.get().getEcon().withdrawPlayer(name, getBalance());
+
+        /*Core.get().getEcon().withdrawPlayer(getOfflinePlayer(), getBalanceInt());*/
     }
 
     public void incrementBalance(int amount) {
         balance+=amount;
 
-        Core.get().getEcon().depositPlayer(name, amount);
+        /*Core.get().getEcon().depositPlayer(getOfflinePlayer(), amount);*/
     }
 
     public void decrementBalance(int amount) {
         balance-=amount;
-        Core.get().getEcon().withdrawPlayer(name, amount);
+
+        /*Core.get().getEcon().withdrawPlayer(getOfflinePlayer(), amount);*/
     }
 }

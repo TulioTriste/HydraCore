@@ -6,6 +6,7 @@ import me.arjona.hydracore.utilities.CC;
 import me.arjona.hydracore.utilities.commands.BaseCommand;
 import me.arjona.hydracore.utilities.commands.Command;
 import me.arjona.hydracore.utilities.commands.CommandArgs;
+import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.entity.Player;
 
 /*
@@ -53,11 +54,21 @@ public class DepositCommand extends BaseCommand {
             return;
         }
 
-        Profile targetProfile = Core.get().getProfileManager().getProfile(target.getUniqueId());
+        EconomyResponse playerResponse = Core.get().getEcon().withdrawPlayer(player, amount);
+        if (playerResponse.transactionSuccess()) {
+            profile.decrementBalance(amount);
+            player.sendMessage(CC.translate("&aYou have deposited " + amount + " to " + target.getName()));
+        } else {
+            player.sendMessage(CC.translate("&cAn error has occurred."));
+        }
 
-        profile.decrementBalance(amount);
-        targetProfile.incrementBalance(amount);
-        player.sendMessage(CC.translate("&aYou have deposited " + amount + " to " + target.getName()));
-        target.sendMessage(CC.translate("&aYou have received " + amount + " from " + player.getName()));
+        Profile targetProfile = Core.get().getProfileManager().getProfile(target.getUniqueId());
+        EconomyResponse targetResponse = Core.get().getEcon().depositPlayer(target, amount);
+        if (targetResponse.transactionSuccess()) {
+            targetProfile.incrementBalance(amount);
+            target.sendMessage(CC.translate("&aYou have received " + amount + " from " + player.getName()));
+        } else {
+            target.sendMessage(CC.translate("&cAn error has occurred."));
+        }
     }
 }
