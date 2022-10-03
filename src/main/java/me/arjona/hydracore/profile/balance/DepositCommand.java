@@ -54,21 +54,9 @@ public class DepositCommand extends BaseCommand {
             return;
         }
 
-        EconomyResponse playerResponse = Core.get().getEcon().withdrawPlayer(player, amount);
-        if (playerResponse.transactionSuccess()) {
-            profile.decrementBalance(amount);
-            player.sendMessage(CC.translate("&aYou have deposited " + amount + " to " + target.getName()));
-        } else {
-            player.sendMessage(CC.translate("&cAn error has occurred."));
-        }
+        profile.setBalance(profile.getBalance() - amount, "&aYou have deposited {amount} to " + target.getName());
 
         Profile targetProfile = Core.get().getProfileManager().getProfile(target.getUniqueId());
-        EconomyResponse targetResponse = Core.get().getEcon().depositPlayer(target, amount);
-        if (targetResponse.transactionSuccess()) {
-            targetProfile.incrementBalance(amount);
-            target.sendMessage(CC.translate("&aYou have received " + amount + " from " + player.getName()));
-        } else {
-            target.sendMessage(CC.translate("&cAn error has occurred."));
-        }
+        targetProfile.setBalance(targetProfile.getBalance()+amount, "&aYou have received {amount} from " + player.getName());
     }
 }

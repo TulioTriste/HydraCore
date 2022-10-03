@@ -6,9 +6,7 @@ import me.arjona.hydracore.utilities.CC;
 import me.arjona.hydracore.utilities.commands.BaseCommand;
 import me.arjona.hydracore.utilities.commands.Command;
 import me.arjona.hydracore.utilities.commands.CommandArgs;
-import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 /*
@@ -32,8 +30,17 @@ public class BalanceCommand extends BaseCommand {
             return;
         }
 
-        OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
-        double response = Core.get().getEcon().getBalance(target);
-        player.sendMessage(CC.translate("&a" + target.getName() + "'s balance is: " + response));
+        Player target = Bukkit.getPlayer(args[0]);
+        if (target != null) {
+            Profile targetProfile = Core.get().getProfileManager().getProfile(target.getUniqueId());
+            player.sendMessage(CC.translate("&a" + target.getName() + "'s balance is: " + targetProfile.getBalance()));
+        } else {
+            Profile targetProfile = Core.get().getProfileManager().getOfflineProfile(args[0]);
+            if (targetProfile != null) {
+                player.sendMessage(CC.translate("&a" + targetProfile.getName() + "'s balance is: " + targetProfile.getBalance()));
+            } else {
+                player.sendMessage(CC.translate("&cPlayer not found."));
+            }
+        }
     }
 }

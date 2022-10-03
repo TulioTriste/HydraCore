@@ -1,6 +1,5 @@
 package me.arjona.hydracore.leaderboard;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.Getter;
 import me.arjona.hydracore.Core;
@@ -18,18 +17,18 @@ import java.util.*;
     https://discord.pandacommunity.org/development
 */
 @Getter
-public class Leaderboard {
+public class LeaderboardManager {
 
     private Set<Profile> profiles = Sets.newConcurrentHashSet();
     private final LinkedList<Profile> top = new LinkedList<>();
 
-    public Leaderboard() {
+    public LeaderboardManager() {
         TaskUtil.runTimerAsync(() -> {
             profiles = getAllProfiles();
-        }, 100, 20*60*7);
+        }, 100, 20*60*5);
 
         TaskUtil.runTimerAsync(() -> {
-            profiles.stream().sorted((o1, o2) -> Integer.compare(o2.getBalance(), o1.getBalance())).forEach(top::add);
+            profiles.stream().sorted((o1, o2) -> Integer.compare(o2.getBalance(), o1.getBalance())).limit(10).forEach(top::add);
         }, 300, 20*60*5);
     }
 

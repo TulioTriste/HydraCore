@@ -6,6 +6,8 @@ import me.arjona.hydracore.utilities.CC;
 import me.arjona.hydracore.utilities.commands.BaseCommand;
 import me.arjona.hydracore.utilities.commands.Command;
 import me.arjona.hydracore.utilities.commands.CommandArgs;
+import me.arjona.hydracore.utilities.redis.impl.Payload;
+import me.arjona.hydracore.utilities.redis.util.RedisMessage;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.entity.Player;
 
@@ -48,12 +50,6 @@ public class SetSubCommand extends BaseCommand {
             return;
         }
 
-        EconomyResponse response = Core.get().getEcon().depositPlayer(target.getOfflinePlayer(), amount);
-        if (response.transactionSuccess()) {
-            target.setBalance(amount);
-            player.sendMessage(CC.translate("&aYou have set " + target.getName() + "'s balance to " + amount));
-        } else {
-            player.sendMessage(CC.translate("&cAn error has occurred."));
-        }
+        target.setBalance(amount, "&aYou have set {player_name}'s balance to {amount}");
     }
 }

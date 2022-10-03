@@ -5,6 +5,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import me.arjona.hydracore.Core;
+import me.arjona.hydracore.profile.Profile;
 import me.arjona.hydracore.teleport.TPInfo;
 import me.arjona.hydracore.utilities.CC;
 import me.arjona.hydracore.utilities.redis.impl.Payload;
@@ -142,9 +143,21 @@ public class RedisListener extends JedisPubSub {
                             out.writeUTF(redisMessage.getParam("SENDSERVER"));
 
                             player.sendPluginMessage(plugin, "BungeeCord", out.toByteArray());
-
-                            System.out.println("TPA_ACCEPT_RESPONSE: " + redisMessage.getParam("SENDSERVER"));
                         }
+                    }
+                }
+                break;
+            }
+            case BALANCE_EDIT: {
+                Player player = Bukkit.getPlayer(UUID.fromString(redisMessage.getParam("UUID")));
+                if (player != null) {
+                    Profile profile = plugin.getProfileManager().getProfile(player.getUniqueId());
+                    profile.setBalance(Integer.parseInt(redisMessage.getParam("AMOUNT")));
+
+                    if (redisMessage.getParam("MESSAGEMODE").equals("TRUE")) {
+                        player.sendMessage(CC.translate(redisMessage.getParam("MESSAGE")
+                                .replace("{amount}", String.valueOf(profile.getBalance()))
+                                .replace("{player_name}", player.getName())));
                     }
                 }
                 break;

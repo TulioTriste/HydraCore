@@ -5,6 +5,11 @@ import com.mongodb.client.model.ReplaceOptions;
 import lombok.Getter;
 import lombok.Setter;
 import me.arjona.hydracore.Core;
+import me.arjona.hydracore.utilities.CC;
+import me.arjona.hydracore.utilities.TaskUtil;
+import me.arjona.hydracore.utilities.redis.impl.Payload;
+import me.arjona.hydracore.utilities.redis.util.RedisMessage;
+import net.milkbowl.vault.economy.EconomyResponse;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -75,9 +80,34 @@ public class Profile {
         /*return Core.get().getEcon().getBalance(getOfflinePlayer());*/
     }
 
-    public void setBalance(int balance) {
-        this.balance = balance;
+    public void setBalance(int balance, String message) {
+        double difference = this.balance - balance;
 
+        EconomyResponse response;
+
+        if (difference > 0) {
+            response = Core.get().getEcon().depositPlayer(getOfflinePlayer(), difference);
+        } else {
+            response = Core.get().getEcon().withdrawPlayer(getOfflinePlayer(), -difference);
+        }
+        TaskUtil.runAsync(this::save);
+        if (getPlayer() != null) {
+            this.balance = balance;
+            if (message != null) {
+                if (response.transactionSuccess()) {
+                    getPlayer().sendMessage(CC.translate(message));
+                } else {
+                    getPlayer().sendMessage(CC.translate("&cAn error has occurred."));
+                }
+            }
+        } else {
+            Core.get().getRedisManager().write(new RedisMessage(Payload.BALANCE_EDIT)
+                    .setParam("UUID", uuid.toString())
+                    .setParam("AMOUNT", String.valueOf(balance))
+                    .setParam("MESSAGEMODE", message != null ? "TRUE" : "FALSE")
+                    .setParam("MESSAGE", message != null ? message : "")
+                    .toJSON());
+        }
         /*Core.get().getEcon().withdrawPlayer(getOfflinePlayer(), getBalanceInt());*/
     }
 
