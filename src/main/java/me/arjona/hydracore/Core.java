@@ -27,6 +27,11 @@ import me.arjona.hydracore.utilities.FileConfig;
 import me.arjona.hydracore.utilities.commands.CommandManager;
 import me.arjona.hydracore.utilities.menu.MenuListener;
 import me.arjona.hydracore.utilities.redis.Redis;
+import me.arjona.hydracore.warp.WarpListener;
+import me.arjona.hydracore.warp.WarpManager;
+import me.arjona.hydracore.warp.commands.CreateWarpCommand;
+import me.arjona.hydracore.warp.commands.DeleteWarpCommand;
+import me.arjona.hydracore.warp.commands.WarpCommand;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -45,6 +50,7 @@ public class Core extends JavaPlugin {
     private SpawnManager spawnManager;
     private TeleportManager teleportManager;
     private LeaderboardManager leaderboardManager;
+    private WarpManager warpManager;
     private String serverName;
     private Economy econ = null;
 
@@ -77,21 +83,23 @@ public class Core extends JavaPlugin {
         // Plugin shutdown logic
         getServer().getConsoleSender().sendMessage(CC.translate("&cDisabling HydraCore..."));
         profileManager.saveAll();
+        warpManager.saveAll();
     }
 
     private void initManagers() {
         profileManager = new ProfileManager();
         spawnManager = new SpawnManager();
         teleportManager = new TeleportManager();
-        this.leaderboardManager = new LeaderboardManager();
-
+        leaderboardManager = new LeaderboardManager();
+        warpManager = new WarpManager();
     }
 
     private void initListeners() {
         Arrays.asList(new MenuListener(),
                     new SpawnListener(),
                         new ProfileListener(),
-                        new TeleportListener())
+                        new TeleportListener(),
+                        new WarpListener())
                 .forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this));
     }
 
@@ -111,6 +119,9 @@ public class Core extends JavaPlugin {
         new DepositCommand();
         new SetSubCommand();
         new TestCommand();
+        new WarpCommand();
+        new CreateWarpCommand();
+        new DeleteWarpCommand();
     }
 
     private void initDatabase() {

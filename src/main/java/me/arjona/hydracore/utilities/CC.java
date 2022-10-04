@@ -1,39 +1,44 @@
 package me.arjona.hydracore.utilities;
 
+import lombok.experimental.UtilityClass;
+import me.arjona.hydracore.Core;
+import me.arjona.hydracore.utilities.redis.impl.Payload;
+import me.arjona.hydracore.utilities.redis.util.RedisMessage;
 import org.bukkit.ChatColor;
 
 import java.util.*;
 
+@UtilityClass
 public class CC {
 
-    private static final Map<String, ChatColor> MAP;
+    private final Map<String, ChatColor> MAP;
 
-    public static final String BLUE;
-    public static final String AQUA;
-    public static final String YELLOW;
-    public static final String RED;
-    public static final String GRAY;
-    public static final String GOLD;
-    public static final String GREEN;
-    public static final String WHITE;
-    public static final String BLACK;
-    public static final String BOLD;
-    public static final String ITALIC;
-    public static final String UNDER_LINE;
-    public static final String STRIKE_THROUGH;
-    public static final String RESET;
-    public static final String MAGIC;
-    public static final String DARK_BLUE;
-    public static final String DARK_AQUA;
-    public static final String DARK_GRAY;
-    public static final String DARK_GREEN;
-    public static final String DARK_PURPLE;
-    public static final String DARK_RED;
-    public static final String PINK;
-    public static final String MENU_BAR;
-    public static final String CHAT_BAR;
-    public static final String SB_BAR;
-    public static final String TAB_BAR;
+    public final String BLUE;
+    public final String AQUA;
+    public final String YELLOW;
+    public final String RED;
+    public final String GRAY;
+    public final String GOLD;
+    public final String GREEN;
+    public final String WHITE;
+    public final String BLACK;
+    public final String BOLD;
+    public final String ITALIC;
+    public final String UNDER_LINE;
+    public final String STRIKE_THROUGH;
+    public final String RESET;
+    public final String MAGIC;
+    public final String DARK_BLUE;
+    public final String DARK_AQUA;
+    public final String DARK_GRAY;
+    public final String DARK_GREEN;
+    public final String DARK_PURPLE;
+    public final String DARK_RED;
+    public final String PINK;
+    public final String MENU_BAR;
+    public final String CHAT_BAR;
+    public final String SB_BAR;
+    public final String TAB_BAR;
 
     static {
         MAP = new HashMap<>();
@@ -73,11 +78,11 @@ public class CC {
         TAB_BAR = ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "-----------------";
     }
 
-    public static Set<String> getColorNames() {
+    public Set<String> getColorNames() {
         return MAP.keySet();
     }
 
-    public static ChatColor getColorFromName(String name) {
+    public ChatColor getColorFromName(String name) {
         if (MAP.containsKey(name.trim().toLowerCase())) {
             return MAP.get(name.trim().toLowerCase());
         }
@@ -93,11 +98,11 @@ public class CC {
         return color;
     }
 
-    public static String translate(String in) {
+    public String translate(String in) {
         return ChatColor.translateAlternateColorCodes('&', in);
     }
 
-    public static List<String> translate(List<String> lines) {
+    public List<String> translate(List<String> lines) {
         List<String> toReturn = new ArrayList<>();
 
         for (String line : lines) {
@@ -107,7 +112,7 @@ public class CC {
         return toReturn;
     }
 
-    public static String[] translate(String[] lines) {
+    public String[] translate(String[] lines) {
         List<String> toReturn = new ArrayList<>();
 
         for (String line : lines) {
@@ -119,11 +124,11 @@ public class CC {
         return toReturn.toArray(new String[toReturn.size()]);
     }
 
-    public static String strip(String message) {
+    public String strip(String message) {
         return ChatColor.stripColor(message);
     }
 
-    public static ChatColor getByName(String name) {
+    public ChatColor getByName(String name) {
         for (ChatColor chatColor : ChatColor.values()) {
             if (chatColor.name().equalsIgnoreCase(name)) {
                 return chatColor;
@@ -132,10 +137,20 @@ public class CC {
         return null;
     }
 
-    public static boolean isColor(net.md_5.bungee.api.ChatColor color) {
+    public boolean isColor(net.md_5.bungee.api.ChatColor color) {
         return color != null &&
                 (color != net.md_5.bungee.api.ChatColor.STRIKETHROUGH && color != net.md_5.bungee.api.ChatColor.MAGIC
                         && color != net.md_5.bungee.api.ChatColor.BOLD && color != net.md_5.bungee.api.ChatColor.ITALIC
                         && color != net.md_5.bungee.api.ChatColor.UNDERLINE && color != net.md_5.bungee.api.ChatColor.RESET);
+    }
+
+    public void redisLog(String message, Map<String, String> variables) {
+        RedisMessage redisMessage = new RedisMessage(Payload.REDIS_LOG_MESSAGE);
+        redisMessage.setParam("MESSAGE", "&c[HydraCore] &7" + message);
+        for (Map.Entry<String, String> stringStringEntry : variables.entrySet()) {
+            redisMessage.setParam(stringStringEntry.getKey(), stringStringEntry.getValue());
+        }
+
+        Core.get().getRedisManager().write(redisMessage.toJSON());
     }
 }
