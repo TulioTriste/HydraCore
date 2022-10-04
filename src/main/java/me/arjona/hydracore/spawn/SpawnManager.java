@@ -9,6 +9,7 @@ import me.arjona.hydracore.utilities.LocationUtil;
 import org.bukkit.Location;
 
 import java.time.Duration;
+import java.util.UUID;
 
 /*
     This project is Currently
@@ -26,7 +27,6 @@ public class SpawnManager {
     public SpawnManager() {
         this.cacheBuilder = CacheBuilder.newBuilder()
                 .expireAfterWrite(Duration.ofSeconds(30))
-                .expireAfterAccess(Duration.ofSeconds(1))
                 .maximumSize(100)
                 .build();
         if (Core.get().getMainConfig().getConfiguration().get("SPAWN_LOCATION") != null) {

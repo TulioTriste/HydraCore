@@ -6,8 +6,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import java.util.Objects;
-
 /*
     This project is Currently
     worked by Arjona, the best dev
@@ -21,8 +19,7 @@ public class SpawnListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         if (Core.get().getSpawnManager().getSpawnLocation() != null
-                && Core.get().getSpawnManager().getCacheBuilder().getIfPresent("Hydra") != null
-                && Objects.equals(Core.get().getSpawnManager().getCacheBuilder().getIfPresent("Hydra"), player.getName())) {
+                && Core.get().getSpawnManager().getCacheBuilder().getIfPresent(player.getName()) != null) {
             player.teleport(Core.get().getSpawnManager().getSpawnLocation());
         }
     }
