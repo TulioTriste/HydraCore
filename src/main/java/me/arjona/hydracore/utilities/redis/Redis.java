@@ -54,7 +54,7 @@ public class Redis {
                 if (password != null || !password.equals(""))
                     jedis.auth(this.password);
             }
-            TaskUtil.runAsync(() -> jedis.publish("hydra-core", json));
+            jedis.publish("hydra-core", json);
         }
     }
 }
