@@ -64,15 +64,8 @@ public class WarpManager {
 
         Core.get().getRedisManager().write(new RedisMessage(Payload.DELETE_WARP)
                 .setParam("NAME", warp.getName())
+                .setParam("SERVER", Core.get().getServerName())
                 .toJSON());
-    }
-
-    public void saveAll() {
-        TaskUtil.runAsync(() -> {
-            for (Warp warp : warps) {
-                warp.save();
-            }
-        });
     }
 
     public Warp getByName(String warp) {

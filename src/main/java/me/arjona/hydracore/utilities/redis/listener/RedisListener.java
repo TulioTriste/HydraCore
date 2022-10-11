@@ -169,7 +169,7 @@ public class RedisListener extends JedisPubSub {
                     if (plugin.getWarpManager().getByName(warpName) != null) {
                         plugin.getWarpManager().getCacheBuilder().put(UUID.fromString(redisMessage.getParam("PLAYERUUID")), warpName);
                         plugin.getRedisManager().write(new RedisMessage(Payload.WARP_TELEPORT_RESPONSE)
-                                .setParam("SERVERTARGET", redisMessage.getParam("SERVER"))
+                                .setParam("SERVER", redisMessage.getParam("SENDSERVER"))
                                 .setParam("WARPNAME", warpName)
                                 .setParam("PLAYERUUID", redisMessage.getParam("PLAYERUUID"))
                                 .setParam("ERROR", "FALSE")

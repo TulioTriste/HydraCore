@@ -5,6 +5,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import java.util.Objects;
+
 /*
     This project is Currently
     worked by Arjona, the best dev
@@ -20,7 +22,7 @@ public class LocationUtil {
             return "null";
         }
 
-        return location.getWorld().getName() + ":" + location.getX() + ":" + location.getY() + ":" + location.getZ() +
+        return Objects.requireNonNull(location.getWorld()).getName() + ":" + location.getX() + ":" + location.getY() + ":" + location.getZ() +
                 ":" + location.getYaw() + ":" + location.getPitch();
     }
 

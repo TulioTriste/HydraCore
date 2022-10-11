@@ -22,7 +22,7 @@ public class WarpListener implements Listener {
 
         if (Core.get().getWarpManager().getCacheBuilder().getIfPresent(player.getUniqueId()) != null) {
             Warp warp = Core.get().getWarpManager().getByName(Core.get().getWarpManager().getCacheBuilder().getIfPresent(player.getUniqueId()));
-            warp.teleport(player);
+            player.teleport(warp.getLocation());
             player.sendMessage(CC.translate("&aTeleported to &e" + warp.getName() + "&a."));
         }
     }

@@ -52,6 +52,7 @@ public class WarpCommand extends BaseCommand {
             player.sendMessage(CC.translate("&aTeleported to &e" + warp.getName() + "&a."));
         } else {
             Core.get().getRedisManager().write(new RedisMessage(Payload.WARP_TELEPORT_REPLICA)
+                    .setParam("SENDSERVER", Core.get().getServerName())
                     .setParam("WARPNAME", warp.getName())
                     .setParam("SERVER", warp.getServer())
                     .setParam("PLAYERUUID", player.getUniqueId().toString())

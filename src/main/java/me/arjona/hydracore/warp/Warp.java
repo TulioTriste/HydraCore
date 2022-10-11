@@ -3,7 +3,7 @@ package me.arjona.hydracore.warp;
 import com.mongodb.client.model.ReplaceOptions;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 import me.arjona.hydracore.Core;
 import me.arjona.hydracore.utilities.LocationUtil;
@@ -22,10 +22,10 @@ import org.bukkit.entity.Player;
 @AllArgsConstructor
 public class Warp {
 
-    public final String name;
-    public final String creator;
-    public final String server;
-    public final Location location;
+    @NonNull public final String name;
+    @NonNull public final String creator;
+    @NonNull public final String server;
+    @NonNull public final Location location;
     public String displayName;
 
     public void save() {

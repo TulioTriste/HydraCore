@@ -2,5 +2,8 @@ name: HydraCore
 version: '${project.version}'
 main: me.arjona.hydracore.Core
 api-version: 1.18
-load: STARTUP
 authors: [ Arjona ]
+loadbefore:
+  - Essentials
+softdepend:
+  - Multiverse-Core

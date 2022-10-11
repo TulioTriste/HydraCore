@@ -83,7 +83,6 @@ public class Core extends JavaPlugin {
         // Plugin shutdown logic
         getServer().getConsoleSender().sendMessage(CC.translate("&cDisabling HydraCore..."));
         profileManager.saveAll();
-        warpManager.saveAll();
     }
 
     private void initManagers() {
