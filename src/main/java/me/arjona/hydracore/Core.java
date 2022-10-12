@@ -7,7 +7,7 @@ import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoDatabase;
 import lombok.Getter;
 import me.arjona.hydracore.leaderboard.LeaderboardManager;
-import me.arjona.hydracore.leaderboard.TestCommand;
+import me.arjona.hydracore.leaderboard.LeaderboardCommand;
 import me.arjona.hydracore.profile.ProfileListener;
 import me.arjona.hydracore.profile.balance.BalanceCommand;
 import me.arjona.hydracore.profile.balance.DepositCommand;
@@ -117,7 +117,7 @@ public class Core extends JavaPlugin {
         new BalanceCommand();
         new DepositCommand();
         new SetSubCommand();
-        new TestCommand();
+        new LeaderboardCommand();
         new WarpCommand();
         new CreateWarpCommand();
         new DeleteWarpCommand();

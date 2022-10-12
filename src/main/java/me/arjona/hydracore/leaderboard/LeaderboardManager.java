@@ -28,6 +28,7 @@ public class LeaderboardManager {
         }, 100, 20*60*5);
 
         TaskUtil.runTimerAsync(() -> {
+            top.clear();
             profiles.stream().sorted((o1, o2) -> Integer.compare(o2.getBalance(), o1.getBalance())).limit(10).forEach(top::add);
         }, 300, 20*60*5);
     }
