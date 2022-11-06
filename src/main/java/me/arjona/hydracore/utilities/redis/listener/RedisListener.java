@@ -104,36 +104,35 @@ public class RedisListener extends JedisPubSub {
                 break;
             }
             case TPA_ACCEPT_REPLICA: {
-                if (redisMessage.getParam("SERVER").equals(plugin.getServerName())) {
-                    Player player = Bukkit.getPlayer(UUID.fromString(redisMessage.getParam("SENDERUUID")));
-                    if (player != null) {
-                        plugin.getTeleportManager().getCacheAccept().put(player.getUniqueId(),
-                                new TPInfo(redisMessage.getParam("SENDERNAME"),
-                                        UUID.fromString(redisMessage.getParam("SENDERUUID")),
-                                        redisMessage.getParam("TARGETNAME"),
-                                        UUID.fromString(redisMessage.getParam("TARGETUUID")),
-                                        redisMessage.getParam("SERVER")));
+                Player player = Bukkit.getPlayer(UUID.fromString(redisMessage.getParam("SENDERUUID")));
+                if (player != null) {
+                    plugin.getTeleportManager().getCacheAccept().put(player.getUniqueId(),
+                            new TPInfo(redisMessage.getParam("SENDERNAME"),
+                                    UUID.fromString(redisMessage.getParam("SENDERUUID")),
+                                    redisMessage.getParam("TARGETNAME"),
+                                    UUID.fromString(redisMessage.getParam("TARGETUUID")),
+                                    redisMessage.getParam("SERVER")));
 
-                        plugin.getRedisManager().write(new RedisMessage(Payload.TPA_ACCEPT_RESPONSE)
-                                .setParam("PLAYERUUID", redisMessage.getParam("SENDERUUID"))
-                                .setParam("SERVER", redisMessage.getParam("TARGETSV"))
-                                .setParam("SENDSERVER", redisMessage.getParam("SERVER"))
-                                .setParam("CAN_ACCEPT", "TRUE")
-                                .toJSON());
-                    } else {
-                        plugin.getRedisManager().write(new RedisMessage(Payload.TPA_ACCEPT_RESPONSE)
-                                .setParam("PLAYERUUID", redisMessage.getParam("SENDERUUID"))
-                                .setParam("TARGETNAME", redisMessage.getParam("TARGETNAME"))
-                                .setParam("SERVER", redisMessage.getParam("TARGETSV"))
-                                .setParam("SENDSERVER", redisMessage.getParam("SERVER"))
-                                .setParam("CANACCEPT", "FALSE")
-                                .toJSON());
-                    }
+                    plugin.getRedisManager().write(new RedisMessage(Payload.TPA_ACCEPT_RESPONSE)
+                            .setParam("PLAYERUUID", redisMessage.getParam("SENDERUUID"))
+                            .setParam("SERVER", redisMessage.getParam("TARGETSV"))
+                            .setParam("SENDSERVER", redisMessage.getParam("SERVER"))
+                            .setParam("CAN_ACCEPT", "TRUE")
+                            .toJSON());
+                } else {
+                    plugin.getRedisManager().write(new RedisMessage(Payload.TPA_ACCEPT_RESPONSE)
+                            .setParam("PLAYERUUID", redisMessage.getParam("SENDERUUID"))
+                            .setParam("TARGETNAME", redisMessage.getParam("TARGETNAME"))
+                            .setParam("SERVER", redisMessage.getParam("TARGETSV"))
+                            .setParam("SENDSERVER", redisMessage.getParam("SERVER"))
+                            .setParam("CANACCEPT", "FALSE")
+                            .toJSON());
                 }
                 break;
             }
             case TPA_ACCEPT_RESPONSE: {
                 if (redisMessage.getParam("SERVER").equals(plugin.getServerName())) {
+                    System.out.println("TPA_ACCEPT_RESPONSE");
                     Player player = Bukkit.getPlayer(UUID.fromString(redisMessage.getParam("PLAYERUUID")));
                     if (player != null) {
                         if (redisMessage.getParam("CANACCEPT").equals("FALSE")) {
@@ -153,7 +152,8 @@ public class RedisListener extends JedisPubSub {
                 Player player = Bukkit.getPlayer(UUID.fromString(redisMessage.getParam("UUID")));
                 if (player != null) {
                     Profile profile = plugin.getProfileManager().getProfile(player.getUniqueId());
-                    profile.setBalance(Integer.parseInt(redisMessage.getParam("AMOUNT")));
+                    profile.setBalance(Integer.parseInt(redisMessage.getParam("AMOUNT")), null,
+                            Boolean.parseBoolean(redisMessage.getParam("SETMODE")));
 
                     if (redisMessage.getParam("MESSAGEMODE").equals("TRUE")) {
                         player.sendMessage(CC.translate(redisMessage.getParam("MESSAGE")
@@ -227,6 +227,33 @@ public class RedisListener extends JedisPubSub {
                 for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                     if (onlinePlayer.hasPermission("hydracore.redislog")) {
                         onlinePlayer.sendMessage(CC.translate(redisMessage.getParam("MESSAGE")));
+                    }
+                }
+                break;
+            }
+            case DEPOSIT_REPLICA: {
+                Player target = Bukkit.getPlayer(redisMessage.getParam("TARGET"));
+                if (target != null) {
+                    Profile profile = plugin.getProfileManager().getProfile(target.getUniqueId());
+                    int amount = Integer.parseInt(redisMessage.getParam("AMOUNT"));
+                    profile.setBalance(amount, "&aYou have received " + amount + " from " + redisMessage.getParam("PLAYER"), false);
+                    plugin.getRedisManager().write(new RedisMessage(Payload.DEPOSIT_RESPONSE)
+                            .setParam("SERVER", redisMessage.getParam("SERVER"))
+                            .setParam("PLAYER", redisMessage.getParam("PLAYER"))
+                            .setParam("TARGET", redisMessage.getParam("TARGET"))
+                            .setParam("AMOUNT", redisMessage.getParam("AMOUNT"))
+                            .toJSON());
+                }
+                break;
+            }
+            case DEPOSIT_RESPONSE: {
+                if (redisMessage.getParam("SERVER").equals(plugin.getServerName())) {
+                    Player player = Bukkit.getPlayer(redisMessage.getParam("PLAYER"));
+                    int amount = Integer.parseInt(redisMessage.getParam("AMOUNT"));
+                    if (player != null) {
+                        Profile profile = plugin.getProfileManager().getProfile(player.getUniqueId());
+                        profile.setWaitingDepositResponse(false);
+                        profile.setBalance(-amount, CC.translate("&aYou have deposited " + redisMessage.getParam("AMOUNT") + " to " + redisMessage.getParam("TARGET")), false);
                     }
                 }
                 break;

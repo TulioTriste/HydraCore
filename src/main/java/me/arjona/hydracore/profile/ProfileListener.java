@@ -43,7 +43,7 @@ public class ProfileListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         Profile profile = Core.get().getProfileManager().getProfile(player.getUniqueId());
-        profile.setBalance(profile.getBalance(), null);
+        profile.setBalance(profile.getBalance(), null, true);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

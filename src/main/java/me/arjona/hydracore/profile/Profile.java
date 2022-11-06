@@ -30,7 +30,7 @@ public class Profile {
     private final UUID uuid;
     private final String name;
     private int balance = 0;
-    private boolean online = false;
+    private boolean online = false, waitingDepositResponse = false;
 
     public Profile(UUID uuid, String name) {
         this.uuid = uuid;
@@ -67,9 +67,9 @@ public class Profile {
         return Bukkit.getPlayer(uuid);
     }
 
-    public OfflinePlayer getOfflinePlayer() {
+    /*public OfflinePlayer getOfflinePlayer() {
         return Bukkit.getOfflinePlayer(uuid);
-    }
+    }*/
 
     /*public String getBalance() {
         return Core.get().getEcon().format(Core.get().getEcon().getBalance(getOfflinePlayer()));
@@ -80,46 +80,39 @@ public class Profile {
         /*return Core.get().getEcon().getBalance(getOfflinePlayer());*/
     }
 
-    public void setBalance(int balance, String message) {
-        double difference = this.balance - balance;
-
+    public void setBalance(int amount, String message, boolean set) {
         EconomyResponse response;
 
-        if (difference > 0) {
-            response = Core.get().getEcon().depositPlayer(getOfflinePlayer(), difference);
-        } else {
-            response = Core.get().getEcon().withdrawPlayer(getOfflinePlayer(), -difference);
-        }
-        TaskUtil.runAsync(this::save);
         if (getPlayer() != null) {
-            this.balance = balance;
+            if (set) {
+                int difference = this.balance-amount;
+
+                response = Core.get().getEcon().depositPlayer(name, difference);
+                this.balance = amount;
+            } else {
+                /*if (amount > 0) {*/
+                response = Core.get().getEcon().depositPlayer(name, amount);
+                /*} else {
+                    response = Core.get().getEcon().withdrawPlayer(getOfflinePlayer(), amount);
+                }*/
+                this.balance += amount;
+            }
             if (message != null) {
-                if (response.transactionSuccess()) {
-                    getPlayer().sendMessage(CC.translate(message));
-                } else {
-                    getPlayer().sendMessage(CC.translate("&cAn error has occurred."));
-                }
+                /*if (response.transactionSuccess()) {*/
+                getPlayer().sendMessage(CC.translate(message));
+                /*} else {
+                    getPlayer().sendMessage(CC.translate(response.errorMessage));
+                }*/
             }
         } else {
             Core.get().getRedisManager().write(new RedisMessage(Payload.BALANCE_EDIT)
                     .setParam("UUID", uuid.toString())
                     .setParam("AMOUNT", String.valueOf(balance))
+                    .setParam("SETMODE", String.valueOf(set))
                     .setParam("MESSAGEMODE", message != null ? "TRUE" : "FALSE")
                     .setParam("MESSAGE", message != null ? message : "")
                     .toJSON());
         }
-        /*Core.get().getEcon().withdrawPlayer(getOfflinePlayer(), getBalanceInt());*/
-    }
-
-    public void incrementBalance(int amount) {
-        balance+=amount;
-
-        /*Core.get().getEcon().depositPlayer(getOfflinePlayer(), amount);*/
-    }
-
-    public void decrementBalance(int amount) {
-        balance-=amount;
-
-        /*Core.get().getEcon().withdrawPlayer(getOfflinePlayer(), amount);*/
+        TaskUtil.runAsync(this::save);
     }
 }

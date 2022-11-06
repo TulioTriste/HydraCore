@@ -50,6 +50,6 @@ public class SetSubCommand extends BaseCommand {
             return;
         }
 
-        target.setBalance(amount, "&aYou have set {player_name}'s balance to {amount}");
+        target.setBalance(amount, "&aYou have set {player_name}'s balance to {amount}", true);
     }
 }
