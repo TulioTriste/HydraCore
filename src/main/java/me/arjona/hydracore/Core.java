@@ -96,10 +96,10 @@ public class Core extends JavaPlugin {
     private void initListeners() {
         Arrays.asList(new MenuListener(),
                     new SpawnListener(),
-                        new ProfileListener(),
-                        new TeleportListener(),
-                        new WarpListener())
-                .forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this));
+                    new ProfileListener(),
+                    new TeleportListener(),
+                    new WarpListener())
+                .forEach(listener -> this.getServer().getPluginManager().registerEvents(listener, this));
     }
 
     private void initConfigs() {

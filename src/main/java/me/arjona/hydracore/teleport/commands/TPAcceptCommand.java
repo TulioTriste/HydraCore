@@ -12,6 +12,8 @@ import me.arjona.hydracore.utilities.redis.impl.Payload;
 import me.arjona.hydracore.utilities.redis.util.RedisMessage;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
+
 /*
     This project is Currently
     worked by Arjona, the best dev
@@ -36,6 +38,9 @@ public class TPAcceptCommand extends BaseCommand {
                     .setParam("SERVER", tpInfo.getServer())
                     .setParam("TARGETSV", Core.get().getServerName())
                     .toJSON());
+
+            Core.get().getTeleportManager().getCacheAccept().put(tpInfo.getSenderUUID(),
+                    new TPInfo(tpInfo.getSenderName(), tpInfo.getSenderUUID(), player.getName(), player.getUniqueId(), Core.get().getServerName()));
 
             player.sendMessage(CC.translate("&aYou have accepted the teleport request."));
         } else {

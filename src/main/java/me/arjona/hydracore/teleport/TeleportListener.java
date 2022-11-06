@@ -23,8 +23,10 @@ public class TeleportListener implements Listener {
         Player player = event.getPlayer();
         TPInfo tpInfo = Core.get().getTeleportManager().getCacheAccept().getIfPresent(player.getUniqueId());
         if (tpInfo != null) {
+            System.out.println("TPInfo");
             Player target = Bukkit.getPlayer(tpInfo.getTargetUUID());
             if (target != null) {
+                System.out.println("Teleporting " + player.getName() + " to " + target.getName());
                 player.teleport(target.getLocation());
             }
         }

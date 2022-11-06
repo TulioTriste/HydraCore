@@ -104,46 +104,44 @@ public class RedisListener extends JedisPubSub {
                 break;
             }
             case TPA_ACCEPT_REPLICA: {
-                Player player = Bukkit.getPlayer(UUID.fromString(redisMessage.getParam("SENDERUUID")));
-                if (player != null) {
-                    plugin.getTeleportManager().getCacheAccept().put(player.getUniqueId(),
-                            new TPInfo(redisMessage.getParam("SENDERNAME"),
-                                    UUID.fromString(redisMessage.getParam("SENDERUUID")),
-                                    redisMessage.getParam("TARGETNAME"),
-                                    UUID.fromString(redisMessage.getParam("TARGETUUID")),
-                                    redisMessage.getParam("SERVER")));
-
-                    plugin.getRedisManager().write(new RedisMessage(Payload.TPA_ACCEPT_RESPONSE)
-                            .setParam("PLAYERUUID", redisMessage.getParam("SENDERUUID"))
-                            .setParam("SERVER", redisMessage.getParam("TARGETSV"))
-                            .setParam("SENDSERVER", redisMessage.getParam("SERVER"))
-                            .setParam("CAN_ACCEPT", "TRUE")
-                            .toJSON());
-                } else {
-                    plugin.getRedisManager().write(new RedisMessage(Payload.TPA_ACCEPT_RESPONSE)
-                            .setParam("PLAYERUUID", redisMessage.getParam("SENDERUUID"))
-                            .setParam("TARGETNAME", redisMessage.getParam("TARGETNAME"))
-                            .setParam("SERVER", redisMessage.getParam("TARGETSV"))
-                            .setParam("SENDSERVER", redisMessage.getParam("SERVER"))
-                            .setParam("CANACCEPT", "FALSE")
-                            .toJSON());
+                if (redisMessage.getParam("TARGETSV").equals(plugin.getServerName())) {
+                    Player player = Bukkit.getPlayer(UUID.fromString(redisMessage.getParam("TARGETUUID")));
+                    if (player != null) {
+                        plugin.getRedisManager().write(new RedisMessage(Payload.TPA_ACCEPT_RESPONSE_ACCEPTED)
+                                .setParam("PLAYERUUID", redisMessage.getParam("SENDERUUID"))
+                                .setParam("SERVER", redisMessage.getParam("TARGETSV"))
+                                .setParam("TARGET", redisMessage.getParam("SERVER"))
+                                .toJSON());
+                    } else {
+                        plugin.getRedisManager().write(new RedisMessage(Payload.TPA_ACCEPT_RESPONSE_DENIED)
+                                .setParam("PLAYERUUID", redisMessage.getParam("SENDERUUID"))
+                                .setParam("TARGETNAME", redisMessage.getParam("TARGETNAME"))
+                                .setParam("SERVER", redisMessage.getParam("TARGETSV"))
+                                .toJSON());
+                    }
                 }
                 break;
             }
-            case TPA_ACCEPT_RESPONSE: {
+            case TPA_ACCEPT_RESPONSE_ACCEPTED: {
                 if (redisMessage.getParam("SERVER").equals(plugin.getServerName())) {
-                    System.out.println("TPA_ACCEPT_RESPONSE");
                     Player player = Bukkit.getPlayer(UUID.fromString(redisMessage.getParam("PLAYERUUID")));
                     if (player != null) {
-                        if (redisMessage.getParam("CANACCEPT").equals("FALSE")) {
-                            player.sendMessage("§c" + redisMessage.getParam("TARGETNAME") + " is not online");
-                        } else {
-                            ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                            out.writeUTF("Connect");
-                            out.writeUTF(redisMessage.getParam("SENDSERVER"));
+                        player.sendMessage("§aThe teleportation request has been accepted");
 
-                            player.sendPluginMessage(plugin, "BungeeCord", out.toByteArray());
-                        }
+                        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+                        out.writeUTF("Connect");
+                        out.writeUTF(redisMessage.getParam("TARGET"));
+
+                        player.sendPluginMessage(plugin, "BungeeCord", out.toByteArray());
+                    }
+                }
+                break;
+            }
+            case TPA_ACCEPT_RESPONSE_DENIED: {
+                if (redisMessage.getParam("SERVER").equals(plugin.getServerName())) {
+                    Player player = Bukkit.getPlayer(UUID.fromString(redisMessage.getParam("PLAYERUUID")));
+                    if (player != null) {
+                        player.sendMessage("§c" + redisMessage.getParam("TARGETNAME") + " is not online");
                     }
                 }
                 break;
