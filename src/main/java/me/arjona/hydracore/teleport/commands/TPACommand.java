@@ -1,6 +1,7 @@
 package me.arjona.hydracore.teleport.commands;
 
 import me.arjona.hydracore.Core;
+import me.arjona.hydracore.utilities.CC;
 import me.arjona.hydracore.utilities.commands.BaseCommand;
 import me.arjona.hydracore.utilities.commands.Command;
 import me.arjona.hydracore.utilities.commands.CommandArgs;
@@ -25,7 +26,12 @@ public class TPACommand extends BaseCommand {
         String[] args = command.getArgs();
 
         if (args.length == 0) {
-            player.sendMessage("§cUsage: /tpa <player>");
+            player.sendMessage(CC.translate("&cUsage: /tpa <player>"));
+            return;
+        }
+
+        if (args[0].equalsIgnoreCase(player.getName())) {
+            player.sendMessage(CC.translate("&cYou can't teleport to yourself."));
             return;
         }
 
