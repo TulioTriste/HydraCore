@@ -1,2 +1,3 @@
 SERVER_NAME: 'survi1' # Porfavor poner exactamente como está en el Proxy
 SPAWN_LOCATION: ''
+TELEPORT_DELAY: 5 # Tiempo en segundos que tarda en teletransportar al jugador usando el /spawn, /tpaccept y /warp
