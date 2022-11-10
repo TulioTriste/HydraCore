@@ -99,7 +99,9 @@ public class Profile {
             }
             if (message != null) {
                 /*if (response.transactionSuccess()) {*/
-                getPlayer().sendMessage(CC.translate(message));
+                getPlayer().sendMessage(CC.translate(message
+                        .replace("{amount}", String.valueOf(amount))
+                        .replace("{player_name}", name)));
                 /*} else {
                     getPlayer().sendMessage(CC.translate(response.errorMessage));
                 }*/
