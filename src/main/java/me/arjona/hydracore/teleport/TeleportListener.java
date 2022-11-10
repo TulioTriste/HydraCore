@@ -1,11 +1,14 @@
 package me.arjona.hydracore.teleport;
 
 import me.arjona.hydracore.Core;
+import me.arjona.hydracore.utilities.CC;
+import me.arjona.hydracore.utilities.TeleportUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 
 import java.util.Objects;
 
@@ -27,6 +30,15 @@ public class TeleportListener implements Listener {
             if (target != null) {
                 player.teleport(target.getLocation());
             }
+        }
+    }
+
+    @EventHandler
+    public void onTryMove(PlayerMoveEvent event) {
+        if (TeleportUtil.getTeleportMap().containsKey(event.getPlayer().getUniqueId())) {
+            Player player = event.getPlayer();
+            TeleportUtil.getTeleportMap().remove(player.getUniqueId());
+            player.sendMessage(CC.translate("&cYou have moved, teleport cancelled."));
         }
     }
 }
