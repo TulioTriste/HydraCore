@@ -8,6 +8,7 @@ import com.mongodb.client.MongoDatabase;
 import lombok.Getter;
 import me.arjona.hydracore.leaderboard.LeaderboardManager;
 import me.arjona.hydracore.leaderboard.LeaderboardCommand;
+import me.arjona.hydracore.placeholderapi.PlaceholderAPI;
 import me.arjona.hydracore.profile.ProfileListener;
 import me.arjona.hydracore.profile.balance.BalanceCommand;
 import me.arjona.hydracore.profile.balance.DepositCommand;
@@ -75,6 +76,12 @@ public class Core extends JavaPlugin {
         initCommands();
         getServer().getPluginManager().registerEvents(new MenuListener(), this);
         serverName = mainConfig.getString("SERVER_NAME");
+
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new PlaceholderAPI(this).register();
+        } else {
+            getServer().getConsoleSender().sendMessage(CC.translate("&cPlaceholderAPI not found!"));
+        }
 
         getServer().getConsoleSender().sendMessage(CC.translate("&aHydraCore loaded successfully!"));
     }
