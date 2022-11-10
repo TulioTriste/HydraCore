@@ -1,4 +1,4 @@
-package me.arjona.hydracore.profile.balance;
+package me.arjona.hydracore.profile.balance.sub;
 
 import me.arjona.hydracore.Core;
 import me.arjona.hydracore.profile.Profile;
@@ -6,21 +6,11 @@ import me.arjona.hydracore.utilities.CC;
 import me.arjona.hydracore.utilities.commands.BaseCommand;
 import me.arjona.hydracore.utilities.commands.Command;
 import me.arjona.hydracore.utilities.commands.CommandArgs;
-import me.arjona.hydracore.utilities.redis.impl.Payload;
-import me.arjona.hydracore.utilities.redis.util.RedisMessage;
-import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.entity.Player;
 
-/*
-    This project is Currently
-    worked by Arjona, the best dev
-    in his house.
-    Arjona#0643
-    https://discord.pandacommunity.org/development
-*/
-public class SetSubCommand extends BaseCommand {
+public class BalanceAddSubCommand extends BaseCommand {
 
-    @Command(name = "balance.set", aliases = {"bal.set", "money.set"}, permission = "hydracore.balance.admin")
+    @Command(name = "balance.add", aliases = {"bal.add", "money.add"}, permission = "hydracore.balance.admin")
     @Override
     public void onCommand(CommandArgs command) {
         Player player = command.getPlayer();
@@ -45,11 +35,11 @@ public class SetSubCommand extends BaseCommand {
             return;
         }
 
-        if (amount < 0) {
-            player.sendMessage(CC.translate("&cYou cant set a negative balance."));
+        if (amount < 1) {
+            player.sendMessage(CC.translate("&cYou cant set a negative or null balance."));
             return;
         }
 
-        target.setBalance(amount, "&aYou have set {player_name}'s balance to {amount}", true);
+        target.setBalance(amount, "&aYou have added {amount} of balance to {player_name}", false);
     }
 }
