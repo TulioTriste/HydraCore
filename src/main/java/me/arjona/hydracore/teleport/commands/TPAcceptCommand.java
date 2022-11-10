@@ -38,7 +38,7 @@ public class TPAcceptCommand extends BaseCommand {
             Player sender = Bukkit.getPlayer(tpInfo.getSenderUUID());
             if (sender != null) {
                 sender.sendMessage(CC.translate("&aThe teleport request has been accepted"));
-                player.teleport(sender.getLocation());
+                sender.teleport(player.getLocation());
             } else {
                 Core.get().getRedisManager().write(new RedisMessage(Payload.TPA_ACCEPT_REPLICA)
                         .setParam("SENDERNAME", tpInfo.getSenderName())
