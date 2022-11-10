@@ -36,7 +36,6 @@ public class RedisListener extends JedisPubSub {
                                 .setParam("SENDER", redisMessage.getParam("SENDER"))
                                 .setParam("SERVER", plugin.getServerName())
                                 .toJSON());
-                    System.out.println("[HydraCore] The Spawn has been removed by " + redisMessage.getParam("SENDER") + " from " + redisMessage.getParam("SERVER"));
                 }
                 break;
             }
@@ -75,12 +74,12 @@ public class RedisListener extends JedisPubSub {
                 break;
             }
             case TPA_REPLICA: {
-                String server = redisMessage.getParam("SERVER");
-                UUID senderUuid = UUID.fromString(redisMessage.getParam("SENDERUUID"));
-                String senderName = redisMessage.getParam("SENDERNAME");
                 String targetName = redisMessage.getParam("TARGET");
                 Player target = Bukkit.getPlayer(targetName);
                 if (target != null) {
+                    String server = redisMessage.getParam("SERVER");
+                    UUID senderUuid = UUID.fromString(redisMessage.getParam("SENDERUUID"));
+                    String senderName = redisMessage.getParam("SENDERNAME");
                     // TPA to another server
                     plugin.getTeleportManager().sendPetition(senderUuid, senderName, target, server);
 
@@ -104,35 +103,22 @@ public class RedisListener extends JedisPubSub {
                 break;
             }
             case TPA_ACCEPT_REPLICA: {
-                if (redisMessage.getParam("TARGETSV").equals(plugin.getServerName())) {
-                    Player player = Bukkit.getPlayer(UUID.fromString(redisMessage.getParam("TARGETUUID")));
+                if (redisMessage.getParam("SERVER").equals(plugin.getServerName())) {
+                    Player player = Bukkit.getPlayer(UUID.fromString(redisMessage.getParam("SENDERUUID")));
                     if (player != null) {
-                        plugin.getRedisManager().write(new RedisMessage(Payload.TPA_ACCEPT_RESPONSE_ACCEPTED)
-                                .setParam("PLAYERUUID", redisMessage.getParam("SENDERUUID"))
-                                .setParam("SERVER", redisMessage.getParam("TARGETSV"))
-                                .setParam("TARGET", redisMessage.getParam("SERVER"))
-                                .toJSON());
+                        player.sendMessage(CC.translate("&aThe teleport request has been accepted"));
+
+                        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+                        out.writeUTF("Connect");
+                        out.writeUTF(redisMessage.getParam("TARGETSV"));
+
+                        player.sendPluginMessage(plugin, "BungeeCord", out.toByteArray());
                     } else {
                         plugin.getRedisManager().write(new RedisMessage(Payload.TPA_ACCEPT_RESPONSE_DENIED)
                                 .setParam("PLAYERUUID", redisMessage.getParam("SENDERUUID"))
                                 .setParam("TARGETNAME", redisMessage.getParam("TARGETNAME"))
                                 .setParam("SERVER", redisMessage.getParam("TARGETSV"))
                                 .toJSON());
-                    }
-                }
-                break;
-            }
-            case TPA_ACCEPT_RESPONSE_ACCEPTED: {
-                if (redisMessage.getParam("SERVER").equals(plugin.getServerName())) {
-                    Player player = Bukkit.getPlayer(UUID.fromString(redisMessage.getParam("PLAYERUUID")));
-                    if (player != null) {
-                        player.sendMessage("§aThe teleportation request has been accepted");
-
-                        ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                        out.writeUTF("Connect");
-                        out.writeUTF(redisMessage.getParam("TARGET"));
-
-                        player.sendPluginMessage(plugin, "BungeeCord", out.toByteArray());
                     }
                 }
                 break;

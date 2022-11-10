@@ -33,7 +33,7 @@ public class Redis {
                 if (password != null || !password.equals(""))
                     jedis.auth(this.password);
             this.redisListener = new RedisListener();
-            (new Thread(() -> jedis.subscribe(this.redisListener, "hydra-core"))).start();
+            (new Thread(() -> jedis.subscribe(this.redisListener, "hydra-core-redis"))).start();
             jedis.connect();
             active = true;
             Core.get().getLogger().info("Successfully redis connection.");
@@ -54,7 +54,7 @@ public class Redis {
                 if (password != null || !password.equals(""))
                     jedis.auth(this.password);
             }
-            jedis.publish("hydra-core", json);
+            jedis.publish("hydra-core-redis", json);
         }
     }
 }
