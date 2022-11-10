@@ -5,6 +5,7 @@ import com.google.common.io.ByteStreams;
 import me.arjona.hydracore.Core;
 import me.arjona.hydracore.teleport.TPInfo;
 import me.arjona.hydracore.utilities.CC;
+import me.arjona.hydracore.utilities.TeleportUtil;
 import me.arjona.hydracore.utilities.commands.BaseCommand;
 import me.arjona.hydracore.utilities.commands.Command;
 import me.arjona.hydracore.utilities.commands.CommandArgs;
@@ -38,7 +39,7 @@ public class TPAcceptCommand extends BaseCommand {
             Player sender = Bukkit.getPlayer(tpInfo.getSenderUUID());
             if (sender != null) {
                 sender.sendMessage(CC.translate("&aThe teleport request has been accepted"));
-                sender.teleport(player.getLocation());
+                TeleportUtil.addTeleport(sender, player.getLocation());
             } else {
                 Core.get().getRedisManager().write(new RedisMessage(Payload.TPA_ACCEPT_REPLICA)
                         .setParam("SENDERNAME", tpInfo.getSenderName())

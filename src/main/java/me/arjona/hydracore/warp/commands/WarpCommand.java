@@ -2,6 +2,7 @@ package me.arjona.hydracore.warp.commands;
 
 import me.arjona.hydracore.Core;
 import me.arjona.hydracore.utilities.CC;
+import me.arjona.hydracore.utilities.TeleportUtil;
 import me.arjona.hydracore.utilities.commands.BaseCommand;
 import me.arjona.hydracore.utilities.commands.Command;
 import me.arjona.hydracore.utilities.commands.CommandArgs;
@@ -48,8 +49,8 @@ public class WarpCommand extends BaseCommand {
         }
 
         if (warp.getServer().equals(Core.get().getServerName())) {
-            warp.teleport(player);
-            player.sendMessage(CC.translate("&aTeleported to &e" + warp.getName() + "&a."));
+            player.sendMessage(CC.translate("&aTeleporting to &e" + warp.getName() + "&a."));
+            TeleportUtil.addTeleport(player, warp.getLocation());
         } else {
             Core.get().getRedisManager().write(new RedisMessage(Payload.WARP_TELEPORT_REPLICA)
                     .setParam("SENDSERVER", Core.get().getServerName())

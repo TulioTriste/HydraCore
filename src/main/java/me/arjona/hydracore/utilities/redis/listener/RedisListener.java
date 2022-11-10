@@ -7,6 +7,7 @@ import me.arjona.hydracore.Core;
 import me.arjona.hydracore.profile.Profile;
 import me.arjona.hydracore.utilities.CC;
 import me.arjona.hydracore.utilities.LocationUtil;
+import me.arjona.hydracore.utilities.TeleportUtil;
 import me.arjona.hydracore.utilities.redis.impl.Payload;
 import me.arjona.hydracore.utilities.redis.util.RedisMessage;
 import me.arjona.hydracore.warp.Warp;
@@ -107,11 +108,7 @@ public class RedisListener extends JedisPubSub {
                     if (player != null) {
                         player.sendMessage(CC.translate("&aThe teleport request has been accepted"));
 
-                        ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                        out.writeUTF("Connect");
-                        out.writeUTF(redisMessage.getParam("TARGETSV"));
-
-                        player.sendPluginMessage(plugin, "BungeeCord", out.toByteArray());
+                        TeleportUtil.addTeleport(player, redisMessage.getParam("TARGETSV"), true);
                     } else {
                         plugin.getRedisManager().write(new RedisMessage(Payload.TPA_ACCEPT_RESPONSE_DENIED)
                                 .setParam("PLAYERUUID", redisMessage.getParam("SENDERUUID"))
@@ -175,11 +172,7 @@ public class RedisListener extends JedisPubSub {
                     Player player = Bukkit.getPlayer(UUID.fromString(redisMessage.getParam("PLAYERUUID")));
                     if (player != null) {
                         if (redisMessage.getParam("ERROR").equals("FALSE")) {
-                            ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                            out.writeUTF("Connect");
-                            out.writeUTF(redisMessage.getParam("WARPSERVER"));
-
-                            player.sendPluginMessage(plugin, "BungeeCord", out.toByteArray());
+                            TeleportUtil.addTeleport(player, redisMessage.getParam("WARPSERVER"), true);
                         } else {
                             player.sendMessage(CC.translate("&cError trying to teleport to warp " + redisMessage.getParam("WARPNAME")));
                         }

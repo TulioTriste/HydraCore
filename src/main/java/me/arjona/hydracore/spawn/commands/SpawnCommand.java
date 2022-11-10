@@ -1,6 +1,7 @@
 package me.arjona.hydracore.spawn.commands;
 
 import me.arjona.hydracore.Core;
+import me.arjona.hydracore.utilities.TeleportUtil;
 import me.arjona.hydracore.utilities.commands.BaseCommand;
 import me.arjona.hydracore.utilities.commands.Command;
 import me.arjona.hydracore.utilities.commands.CommandArgs;
@@ -23,15 +24,15 @@ public class SpawnCommand extends BaseCommand {
         Player player = command.getPlayer();
 
         if (Core.get().getSpawnManager().getSpawnLocation() != null) {
-            player.teleport(Core.get().getSpawnManager().getSpawnLocation());
+            TeleportUtil.addTeleport(player, Core.get().getSpawnManager().getSpawnLocation());
+            /*player.teleport(Core.get().getSpawnManager().getSpawnLocation());*/
             return;
         }
 
-        player.sendMessage("Sending you to Spawn...");
         String json = new RedisMessage(Payload.SEND_SPAWN_REPLICA)
                 .setParam("SENDER", player.getName())
                 .setParam("SERVER", Core.get().getServerName())
                 .toJSON();
-        Core.get().getRedisManager().write(json);
+        TeleportUtil.addTeleport(player, json, false);
     }
 }

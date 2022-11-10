@@ -3,7 +3,6 @@ version: '${project.version}'
 main: me.arjona.hydracore.Core
 api-version: 1.18
 authors: [ Arjona ]
-loadbefore:
-  - Essentials
 softdepend:
   - Multiverse-Core
+  - Essentials
