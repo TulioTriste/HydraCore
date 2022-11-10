@@ -47,6 +47,6 @@ public class BalanceSetSubCommand extends BaseCommand {
             return;
         }
 
-        target.setBalance(amount, "&aYou have set {player_name}'s balance to {amount}", true);
+        target.setVaultBalance(amount, "&aYou have set {player_name}'s balance to {amount}", true);
     }
 }

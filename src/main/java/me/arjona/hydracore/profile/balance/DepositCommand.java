@@ -9,7 +9,6 @@ import me.arjona.hydracore.utilities.commands.Command;
 import me.arjona.hydracore.utilities.commands.CommandArgs;
 import me.arjona.hydracore.utilities.redis.impl.Payload;
 import me.arjona.hydracore.utilities.redis.util.RedisMessage;
-import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.entity.Player;
 
 /*
@@ -68,10 +67,10 @@ public class DepositCommand extends BaseCommand {
                 return;
             }
 
-            profile.setBalance(-amount, "&aYou have deposited {amount} to " + target.getName(), false);
+            profile.setVaultBalance(-amount, "&aYou have deposited {amount} to " + target.getName(), false);
 
             Profile targetProfile = Core.get().getProfileManager().getProfile(target.getUniqueId());
-            targetProfile.setBalance(amount, "&aYou have received {amount} from " + player.getName(), false);
+            targetProfile.setVaultBalance(amount, "&aYou have received {amount} from " + player.getName(), false);
         }
     }
 }

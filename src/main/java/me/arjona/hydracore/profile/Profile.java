@@ -12,7 +12,6 @@ import me.arjona.hydracore.utilities.redis.util.RedisMessage;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bson.Document;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -80,7 +79,7 @@ public class Profile {
         /*return Core.get().getEcon().getBalance(getOfflinePlayer());*/
     }
 
-    public void setBalance(int amount, String message, boolean set) {
+    public void setVaultBalance(int amount, String message, boolean set) {
         EconomyResponse response;
 
         if (getPlayer() != null) {

@@ -5,7 +5,6 @@ import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import me.arjona.hydracore.Core;
 import me.arjona.hydracore.profile.Profile;
-import me.arjona.hydracore.teleport.TPInfo;
 import me.arjona.hydracore.utilities.CC;
 import me.arjona.hydracore.utilities.LocationUtil;
 import me.arjona.hydracore.utilities.redis.impl.Payload;
@@ -136,7 +135,7 @@ public class RedisListener extends JedisPubSub {
                 Player player = Bukkit.getPlayer(UUID.fromString(redisMessage.getParam("UUID")));
                 if (player != null) {
                     Profile profile = plugin.getProfileManager().getProfile(player.getUniqueId());
-                    profile.setBalance(Integer.parseInt(redisMessage.getParam("AMOUNT")), null,
+                    profile.setVaultBalance(Integer.parseInt(redisMessage.getParam("AMOUNT")), null,
                             Boolean.parseBoolean(redisMessage.getParam("SETMODE")));
 
                     if (redisMessage.getParam("MESSAGEMODE").equals("TRUE")) {
@@ -220,7 +219,7 @@ public class RedisListener extends JedisPubSub {
                 if (target != null) {
                     Profile profile = plugin.getProfileManager().getProfile(target.getUniqueId());
                     int amount = Integer.parseInt(redisMessage.getParam("AMOUNT"));
-                    profile.setBalance(amount, "&aYou have received " + amount + " from " + redisMessage.getParam("PLAYER"), false);
+                    profile.setVaultBalance(amount, "&aYou have received " + amount + " from " + redisMessage.getParam("PLAYER"), false);
                     plugin.getRedisManager().write(new RedisMessage(Payload.DEPOSIT_RESPONSE)
                             .setParam("SERVER", redisMessage.getParam("SERVER"))
                             .setParam("PLAYER", redisMessage.getParam("PLAYER"))
@@ -237,7 +236,7 @@ public class RedisListener extends JedisPubSub {
                     if (player != null) {
                         Profile profile = plugin.getProfileManager().getProfile(player.getUniqueId());
                         profile.setWaitingDepositResponse(false);
-                        profile.setBalance(-amount, CC.translate("&aYou have deposited " + redisMessage.getParam("AMOUNT") + " to " + redisMessage.getParam("TARGET")), false);
+                        profile.setVaultBalance(-amount, CC.translate("&aYou have deposited " + redisMessage.getParam("AMOUNT") + " to " + redisMessage.getParam("TARGET")), false);
                     }
                 }
                 break;
