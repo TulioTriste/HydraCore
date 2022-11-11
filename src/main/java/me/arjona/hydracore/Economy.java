@@ -23,48 +23,8 @@ public class Economy implements net.milkbowl.vault.economy.Economy {
     }
 
     @Override
-    public boolean hasBankSupport() {
-        return false;
-    }
-
-    @Override
-    public int fractionalDigits() {
-        return 0;
-    }
-
-    @Override
     public String format(double amount) {
         return MoneyUtil.format(amount);
-    }
-
-    @Override
-    public String currencyNamePlural() {
-        return null;
-    }
-
-    @Override
-    public String currencyNameSingular() {
-        return null;
-    }
-
-    @Override
-    public boolean hasAccount(String playerName) {
-        return false;
-    }
-
-    @Override
-    public boolean hasAccount(OfflinePlayer player) {
-        return false;
-    }
-
-    @Override
-    public boolean hasAccount(String playerName, String worldName) {
-        return false;
-    }
-
-    @Override
-    public boolean hasAccount(OfflinePlayer player, String worldName) {
-        return false;
     }
 
     @Override
@@ -85,26 +45,6 @@ public class Economy implements net.milkbowl.vault.economy.Economy {
     @Override
     public double getBalance(OfflinePlayer player, String world) {
         return plugin.getProfileManager().getOfflineProfile(player.getUniqueId()).getBalance();
-    }
-
-    @Override
-    public boolean has(String playerName, double amount) {
-        return plugin.getProfileManager().getProfile(playerName).getBalance() >= amount;
-    }
-
-    @Override
-    public boolean has(OfflinePlayer player, double amount) {
-        return plugin.getProfileManager().getOfflineProfile(player.getUniqueId()).getBalance() >= amount;
-    }
-
-    @Override
-    public boolean has(String playerName, String worldName, double amount) {
-        return plugin.getProfileManager().getProfile(playerName).getBalance() >= amount;
-    }
-
-    @Override
-    public boolean has(OfflinePlayer player, String worldName, double amount) {
-        return plugin.getProfileManager().getOfflineProfile(player.getUniqueId()).getBalance() >= amount;
     }
 
     @Override
@@ -145,6 +85,68 @@ public class Economy implements net.milkbowl.vault.economy.Economy {
     @Override
     public EconomyResponse depositPlayer(OfflinePlayer player, String worldName, double amount) {
         return plugin.getProfileManager().getOfflineProfile(player.getUniqueId()).deposit(amount);
+    }
+
+    // Unused methods
+
+    @Override
+    public boolean hasBankSupport() {
+        return false;
+    }
+
+    @Override
+    public int fractionalDigits() {
+        return 0;
+    }
+
+    @Override
+    public String currencyNamePlural() {
+        return null;
+    }
+
+    @Override
+    public String currencyNameSingular() {
+        return null;
+    }
+
+    @Override
+    public boolean hasAccount(String playerName) {
+        return false;
+    }
+
+    @Override
+    public boolean hasAccount(OfflinePlayer player) {
+        return false;
+    }
+
+    @Override
+    public boolean hasAccount(String playerName, String worldName) {
+        return false;
+    }
+
+    @Override
+    public boolean hasAccount(OfflinePlayer player, String worldName) {
+        return false;
+    }
+
+    @Override
+    public boolean has(String playerName, double amount) {
+        return false;
+    }
+
+    @Override
+    public boolean has(OfflinePlayer player, double amount) {
+        return false;
+    }
+
+    @Override
+    public boolean has(String playerName, String worldName, double amount) {
+        return false;
+    }
+
+    @Override
+    public boolean has(OfflinePlayer player, String worldName, double amount) {
+        return false;
     }
 
     @Override
