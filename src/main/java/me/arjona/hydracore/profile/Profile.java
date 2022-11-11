@@ -79,8 +79,18 @@ public class Profile {
         /*return Core.get().getEcon().getBalance(getOfflinePlayer());*/
     }
 
-    public void setVaultBalance(int amount, String message, boolean set) {
-        EconomyResponse response;
+    public EconomyResponse withdraw(double amount) {
+        this.balance -= amount;
+        return new EconomyResponse(amount, balance, EconomyResponse.ResponseType.SUCCESS, "You are withdrawing " + amount + " from your account.");
+    }
+
+    public EconomyResponse deposit(double amount) {
+        this.balance += amount;
+        return new EconomyResponse(amount, balance, EconomyResponse.ResponseType.SUCCESS, "You are depositing " + amount + " to your account.");
+    }
+
+    /*public void setVaultBalance(int amount, String message, boolean set) {
+        EconomyResponse response = null;
 
         if (getPlayer() != null) {
             if (set) {
@@ -89,21 +99,56 @@ public class Profile {
                 response = Core.get().getEcon().depositPlayer(name, difference);
                 this.balance = amount;
             } else {
-                /*if (amount > 0) {*/
+                if (amount > 0) {
                 response = Core.get().getEcon().depositPlayer(name, amount);
-                /*} else {
-                    response = Core.get().getEcon().withdrawPlayer(getOfflinePlayer(), amount);
-                }*/
+                } else {
+                    response = Core.get().getEcon().withdrawPlayer(name, amount);
+                }
                 this.balance += amount;
             }
             if (message != null) {
-                /*if (response.transactionSuccess()) {*/
+                if (response.transactionSuccess()) {
                 getPlayer().sendMessage(CC.translate(message
                         .replace("{amount}", String.valueOf(amount))
                         .replace("{player_name}", name)));
-                /*} else {
+                } else {
                     getPlayer().sendMessage(CC.translate(response.errorMessage));
-                }*/
+                }
+            }
+        } else {
+            Core.get().getRedisManager().write(new RedisMessage(Payload.BALANCE_EDIT)
+                    .setParam("UUID", uuid.toString())
+                    .setParam("AMOUNT", String.valueOf(balance))
+                    .setParam("SETMODE", String.valueOf(set))
+                    .setParam("MESSAGEMODE", message != null ? "TRUE" : "FALSE")
+                    .setParam("MESSAGE", message != null ? message : "")
+                    .toJSON());
+        }
+        TaskUtil.runAsync(this::save);
+    }*/
+    public void setVaultBalance(int amount, String message, boolean set) {
+        EconomyResponse response = null;
+
+        if (getPlayer() != null) {
+            if (set) {
+                int difference = this.balance-amount;
+
+                response = Core.get().getEcon().depositPlayer(name, difference);
+            } else {
+                if (amount > 0) {
+                    response = Core.get().getEcon().depositPlayer(name, amount);
+                } else {
+                    response = Core.get().getEcon().withdrawPlayer(name, amount);
+                }
+            }
+            if (message != null) {
+                if (response.transactionSuccess()) {
+                    getPlayer().sendMessage(CC.translate(message
+                            .replace("{amount}", String.valueOf(amount))
+                            .replace("{player_name}", name)));
+                } else {
+                    getPlayer().sendMessage(CC.translate(response.errorMessage));
+                }
             }
         } else {
             Core.get().getRedisManager().write(new RedisMessage(Payload.BALANCE_EDIT)

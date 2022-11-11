@@ -4,5 +4,6 @@ main: me.arjona.hydracore.Core
 api-version: 1.18
 authors: [ Arjona ]
 softdepend:
+  - Vault
   - Multiverse-Core
   - Essentials

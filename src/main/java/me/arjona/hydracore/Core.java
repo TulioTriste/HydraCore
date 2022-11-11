@@ -8,7 +8,6 @@ import com.mongodb.client.MongoDatabase;
 import lombok.Getter;
 import me.arjona.hydracore.leaderboard.LeaderboardManager;
 import me.arjona.hydracore.leaderboard.LeaderboardCommand;
-import me.arjona.hydracore.placeholderapi.PlaceholderAPI;
 import me.arjona.hydracore.profile.ProfileListener;
 import me.arjona.hydracore.profile.balance.BalanceCommand;
 import me.arjona.hydracore.profile.balance.DepositCommand;
@@ -37,6 +36,7 @@ import me.arjona.hydracore.warp.commands.WarpCommand;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
@@ -64,11 +64,7 @@ public class Core extends JavaPlugin {
 
         getServer().getConsoleSender().sendMessage(CC.translate("&aLoading HydraCore..."));
 
-        if (!setupEconomy() ) {
-            getLogger().severe("Disabled due to no Vault dependency found!" + getDescription().getName());
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
+        setupEconomy();
 
         initDatabase();
         initManagers();
@@ -77,11 +73,11 @@ public class Core extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new MenuListener(), this);
         serverName = mainConfig.getString("SERVER_NAME");
 
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+        /*if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new PlaceholderAPI(this).register();
         } else {
             getServer().getConsoleSender().sendMessage(CC.translate("&cPlaceholderAPI not found!"));
-        }
+        }*/
 
         getServer().getConsoleSender().sendMessage(CC.translate("&aHydraCore loaded successfully!"));
     }
@@ -162,16 +158,21 @@ public class Core extends JavaPlugin {
         redisManager.connect();
     }
 
-    private boolean setupEconomy() {
+    private void setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
-            return false;
+            Bukkit.getServer().getPluginManager().disablePlugin(this);
+            getLogger().severe("Disabled due to no Vault dependency found!" + getDescription().getName());
+            return;
         }
+
+        Bukkit.getServicesManager().register(Economy.class, new me.arjona.hydracore.Economy(this), this, ServicePriority.Highest);
+
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
         if (rsp == null) {
-            return false;
+            getLogger().severe("Error trying to get economy provider!");
+            return;
         }
         econ = rsp.getProvider();
-        return econ != null;
     }
 
     public static Core get() {
